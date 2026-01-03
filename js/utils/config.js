@@ -365,7 +365,7 @@ versions["2021"] = versions.resurrections;
 
 const range = (f, min = -Infinity, max = Infinity) => Math.max(min, Math.min(max, f));
 const nullNaN = (f) => (isNaN(f) ? null : f);
-const isTrue = (v) => (typeof v === "string" && v.toLowerCase().includes("true")) || v;
+const isTrue = (v) => (typeof v === "string" ? v.toLowerCase().includes("true") : !!v);
 
 const parseColor = (isHSL) => (s) => ({
 	space: isHSL ? "hsl" : "rgb",
