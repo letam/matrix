@@ -4,67 +4,55 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a web-based implementation of the Matrix digital rain effect (the green falling code from The Matrix films). It runs entirely in the browser using WebGL (via REGL) with experimental WebGPU support.
+Digital Rain is a web-based implementation of the "green code rain" effect from The Matrix franchise. It features dual renderer support (WebGL via REGL and WebGPU), 15+ visual presets, and 60+ configurable parameters. The project can be used standalone or as a React component.
 
-## Running the Project
-
-Serve with any HTTP server. Example using Python:
-```bash
-python3 -m http.server
-```
-Then open `http://localhost:8000` in a browser.
-
-## Code Formatting
+## Commands
 
 ```bash
-prettier --write --use-tabs --print-width 160 "index.html" "./js/**/**.js" "./lib/gpu-buffer.js"
+npm run dev          # Format + start Vite dev server
+npm run build        # Format + build core and full bundles to dist/
+npm run format       # Run ESLint + Prettier
+npm run test         # Start http-server and open manual test page
+npm run test-bundles # Build + run Vite server with bundled version tests
 ```
 
 ## Architecture
 
-### Entry Point and Renderer Selection
-- `index.html` - Loads `js/main.js` as ES module
-- `js/main.js` - Detects WebGPU support and loads either `js/regl/main.js` or `js/webgpu/main.js`
-- `js/config.js` - Parses URL parameters and merges with version presets and defaults
+### Dual Renderer System
+
+Two interchangeable renderer implementations in `js/regl/` and `js/webgpu/`:
+- **REGLRenderer** (`js/regl/renderer.js`): WebGL-based, uses REGL library
+- **WebGPURenderer** (`js/webgpu/renderer.js`): Native WebGPU (beta)
+
+Both extend the base `Renderer` class (`js/renderer.js`) and implement the same interface.
 
 ### Rendering Pipeline
-Both renderers (REGL/WebGPU) implement the same pipeline architecture:
 
-1. **Rain Pass** - GPU-computed simulation using double-buffered textures:
-   - `intro` buffer - Controls the initial screen fill animation
-   - `raindrop` buffer - Tracks raindrop positions and brightness decay
-   - `symbol` buffer - Manages glyph cycling
-   - Final render outputs glyphs using MSDF (multi-channel signed distance field) textures
+Each renderer uses a pass-based architecture where textures flow between stages:
+1. **Rain Pass**: Core effect - computes raindrop states via GPU textures, renders glyphs using MSDF (multi-channel signed distance field)
+2. **Bloom Pass**: Glow effect with multi-scale blur
+3. **Effect Pass**: Color mapping (palette, stripes, image, mirror modes)
+4. **End Pass** (WebGPU only): Final canvas compositing
 
-2. **Bloom Pass** - Multi-step blur effect:
-   - High-pass filter extracts bright areas
-   - Gaussian blur via texture pyramid
-   - Combines blur with original
+### Key Files
 
-3. **Effect Pass** - Color mapping and effects:
-   - `palettePass` - Standard color gradient mapping
-   - `stripePass` - Vertical color stripes (pride flags, etc.)
-   - `imagePass` - Overlays an external image
-   - `mirrorPass` - Webcam mirror effect
+- `js/main.js` - Vanilla JS entry point
+- `js/Matrix.jsx` - React component wrapper
+- `js/utils/config.js` - Configuration system with presets and 60+ parameters
+- `js/staticAssets.js` - Dynamic asset loader for shaders and images
 
-4. **Quilt Pass** - Special output for Looking Glass holographic displays
+### Shaders
 
-### Shader Organization
-- `shaders/glsl/` - GLSL fragment/vertex shaders for REGL
-- `shaders/wgsl/` - WGSL shaders for WebGPU
+- `shaders/glsl/` - OpenGL ES shaders for REGL renderer
+- `shaders/wgsl/` - WebGPU shaders
 
-### Configuration System
-URL parameters override version presets which override defaults. Key structures in `js/config.js`:
-- `fonts` - MSDF texture paths and glyph grid dimensions
-- `defaults` - Base configuration values
-- `versions` - Named presets (classic, resurrections, operator, nightmare, paradise, etc.)
-- `paramMapping` - URL parameter parsing rules
+### Build Outputs
 
-### Asset Types
-- `assets/*_msdf.png` - Multi-channel signed distance field glyph textures
-- `assets/*.ttf` - TrueType fonts (Matrix-Code, Matrix-Resurrected)
-- `assets/*.png` - Texture overlays (metal, mesh, sand, pixel_grid)
+- `dist/digital-rain.core.es.js` / `.cjs` - Core bundle (no React dependency)
+- `dist/digital-rain.full.es.js` / `.cjs` - Full bundle with all features
 
-## Playdate Port
+## Code Style
 
-The `playdate/` directory contains a port for the Playdate handheld console with both C and Lua implementations. See `playdate/INSTRUCTIONS.md` for build commands.
+- Uses tabs for indentation, 100 character print width
+- ESLint with React hooks plugin
+- Prettier for formatting (runs automatically with `npm run dev` and `npm run build`)
