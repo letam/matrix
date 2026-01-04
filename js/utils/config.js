@@ -67,6 +67,131 @@ const textureURLs = {
 const hsl = (...values) => ({ space: "hsl", values });
 const rgb = (...values) => ({ space: "rgb", values });
 
+// Simple hue-based color maps
+const colorMaps = {
+	green: 0.3,
+	blue: 0.55,
+	cyan: 0.5,
+	red: 0.0,
+	orange: 0.083,
+	yellow: 0.15,
+	purple: 0.75,
+	magenta: 0.83,
+	pink: 0.92,
+};
+
+// Helper to generate palette from hue
+const paletteFromHue = (hue, saturation = 0.9) => [
+	{ color: hsl(hue, saturation, 0.0), at: 0.0 },
+	{ color: hsl(hue, saturation, 0.2), at: 0.2 },
+	{ color: hsl(hue, saturation, 0.7), at: 0.7 },
+	{ color: hsl(hue, saturation, 0.8), at: 0.8 },
+];
+
+// Detailed color schemes with custom palettes
+const colorSchemes = {
+	classic: {
+		palette: paletteFromHue(0.3),
+		cursorColor: hsl(0.242, 1, 0.73),
+		backgroundColor: hsl(0, 0, 0),
+	},
+	blue: {
+		palette: paletteFromHue(0.6),
+		cursorColor: hsl(0.6, 1, 0.73),
+		backgroundColor: hsl(0, 0, 0),
+	},
+	cyan: {
+		palette: paletteFromHue(0.5),
+		cursorColor: hsl(0.5, 1, 0.75),
+		backgroundColor: hsl(0, 0, 0),
+	},
+	electricBlue: {
+		palette: [
+			{ color: hsl(0.58, 1, 0.0), at: 0.0 },
+			{ color: hsl(0.58, 1, 0.3), at: 0.3 },
+			{ color: hsl(0.55, 1, 0.6), at: 0.6 },
+			{ color: hsl(0.52, 1, 0.9), at: 1.0 },
+		],
+		cursorColor: hsl(0.52, 1, 0.95),
+		backgroundColor: hsl(0.6, 0.5, 0.02),
+	},
+	fire: {
+		palette: [
+			{ color: hsl(0, 0, 0), at: 0.0 },
+			{ color: hsl(0.0, 1, 0.25), at: 0.3 },
+			{ color: hsl(0.05, 1, 0.5), at: 0.6 },
+			{ color: hsl(0.12, 1, 0.6), at: 0.85 },
+			{ color: hsl(0.15, 1, 0.9), at: 1.0 },
+		],
+		cursorColor: hsl(0.15, 1, 0.95),
+		backgroundColor: hsl(0.0, 0.3, 0.02),
+	},
+	lava: {
+		palette: [
+			{ color: hsl(0, 0.9, 0.05), at: 0.0 },
+			{ color: hsl(0.0, 1, 0.2), at: 0.4 },
+			{ color: hsl(0.03, 1, 0.5), at: 0.7 },
+			{ color: hsl(0.08, 1, 0.7), at: 1.0 },
+		],
+		cursorColor: hsl(0.12, 1, 0.8),
+		backgroundColor: hsl(0, 0.2, 0.03),
+	},
+	sunset: {
+		palette: [
+			{ color: hsl(0.0, 0.8, 0.1), at: 0.0 },
+			{ color: hsl(0.02, 0.9, 0.3), at: 0.3 },
+			{ color: hsl(0.08, 1, 0.5), at: 0.6 },
+			{ color: hsl(0.13, 1, 0.7), at: 0.9 },
+		],
+		cursorColor: hsl(0.15, 1, 0.85),
+		backgroundColor: hsl(0.02, 0.3, 0.05),
+	},
+	purple: {
+		palette: paletteFromHue(0.75),
+		cursorColor: hsl(0.75, 1, 0.75),
+		backgroundColor: hsl(0, 0, 0),
+	},
+	magenta: {
+		palette: paletteFromHue(0.83),
+		cursorColor: hsl(0.83, 1, 0.75),
+		backgroundColor: hsl(0, 0, 0),
+	},
+	pink: {
+		palette: [
+			{ color: hsl(0.92, 0.8, 0.1), at: 0.0 },
+			{ color: hsl(0.92, 0.9, 0.4), at: 0.4 },
+			{ color: hsl(0.92, 1, 0.7), at: 0.8 },
+			{ color: hsl(0.95, 1, 0.9), at: 1.0 },
+		],
+		cursorColor: hsl(0.95, 1, 0.95),
+		backgroundColor: hsl(0.92, 0.2, 0.03),
+	},
+	heaven: {
+		palette: [
+			{ color: hsl(0.15, 0.2, 0.9), at: 0.0 },
+			{ color: hsl(0.55, 0.6, 0.85), at: 0.3 },
+			{ color: hsl(0.58, 0.8, 0.9), at: 0.7 },
+			{ color: hsl(0, 0, 1), at: 1.0 },
+		],
+		cursorColor: hsl(0, 0, 1),
+		backgroundColor: hsl(0.55, 0.3, 0.95),
+		cursorIntensity: 1.5,
+	},
+	hell: {
+		palette: [
+			{ color: hsl(0, 0, 0.05), at: 0.0 },
+			{ color: hsl(0.0, 1, 0.15), at: 0.2 },
+			{ color: hsl(0.0, 1, 0.3), at: 0.5 },
+			{ color: hsl(0.03, 1, 0.5), at: 0.8 },
+			{ color: hsl(0.08, 1, 0.6), at: 1.0 },
+		],
+		cursorColor: hsl(0.03, 1, 0.7),
+		backgroundColor: hsl(0, 0.2, 0.01),
+		bloomStrength: 0.9,
+		highPassThreshold: 0.0,
+	},
+};
+
 const defaults = {
 	font: "matrixcode",
 	effect: "palette", // The name of the effect to apply at the end of the process— mainly handles coloration
@@ -475,6 +600,14 @@ const paramMapping = {
 	suppressWarnings: { key: "suppressWarnings", parser: isTrue },
 	once: { key: "once", parser: isTrue },
 	isometric: { key: "isometric", parser: isTrue },
+	colorMap: {
+		key: "colorMap",
+		parser: (s) => (s in colorMaps ? s : null),
+	},
+	colorScheme: {
+		key: "colorScheme",
+		parser: (s) => (s in colorSchemes ? s : null),
+	},
 };
 
 paramMapping.paletteRGB = paramMapping.palette;
@@ -519,6 +652,22 @@ export default (urlParams = {}) => {
 	const fontName = [validParams.font, version.font, defaults.font].find((name) => name in fonts);
 	const font = fonts[fontName];
 
+	// Apply color scheme if specified
+	let colorSchemeOverrides = {};
+	if (validParams.colorScheme != null) {
+		colorSchemeOverrides = colorSchemes[validParams.colorScheme];
+	}
+
+	// Apply color map if specified (overrides colorScheme)
+	if (validParams.colorMap != null) {
+		const hue = colorMaps[validParams.colorMap];
+		colorSchemeOverrides = {
+			...colorSchemeOverrides,
+			palette: paletteFromHue(hue),
+			cursorColor: hsl(hue, 1, 0.73),
+		};
+	}
+
 	const baseTextureURL =
 		textureURLs[[version.baseTexture, defaults.baseTexture].find((name) => name in textureURLs)];
 	const hasBaseTexture = baseTextureURL != null;
@@ -530,6 +679,7 @@ export default (urlParams = {}) => {
 		...defaults,
 		...version,
 		...font,
+		...colorSchemeOverrides,
 		...validParams,
 		baseTextureURL,
 		glintTextureURL,
