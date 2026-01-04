@@ -75,7 +75,7 @@ const defaults = {
 	useCamera: false,
 	backgroundColor: hsl(0, 0, 0), // The color "behind" the glyphs
 	isolateCursor: true, // Whether the "cursor"— the brightest glyph at the bottom of a raindrop— has its own color
-	cursorColor: hsl(0.6, 1, 0.73), // The color of the cursor
+	cursorColor: hsl(0.242, 1, 0.73), // The color of the cursor
 	cursorIntensity: 2, // The intensity of the cursor
 	isolateGlint: false, // Whether the "glint"— highlights on certain symbols in the font— should appear
 	glintColor: hsl(0, 0, 1), // The color of the glint
@@ -113,10 +113,10 @@ const defaults = {
 	density: 1, // In volumetric mode, the number of actual columns compared to the grid
 	palette: [
 		// The color palette that glyph brightness is color mapped to
-		{ color: hsl(0.6, 0.9, 0.0), at: 0.0 },
-		{ color: hsl(0.6, 0.9, 0.2), at: 0.2 },
-		{ color: hsl(0.6, 0.9, 0.7), at: 0.7 },
-		{ color: hsl(0.6, 0.9, 0.8), at: 0.8 },
+		{ color: hsl(0.3, 0.9, 0.0), at: 0.0 },
+		{ color: hsl(0.3, 0.9, 0.2), at: 0.2 },
+		{ color: hsl(0.3, 0.9, 0.7), at: 0.7 },
+		{ color: hsl(0.3, 0.9, 0.8), at: 0.8 },
 	],
 	raindropLength: 0.75, // Adjusts the frequency of raindrops (and their length) in a column
 	slant: 0, // The angle at which rain falls; the orientation of the glyph grid
@@ -218,7 +218,7 @@ const versions = {
 	resurrections: {
 		font: "resurrections",
 		glyphEdgeCrop: 0.1,
-		cursorColor: hsl(0.6, 1, 0.8),
+		cursorColor: hsl(0.292, 1, 0.8),
 		cursorIntensity: 2,
 		baseBrightness: -0.7,
 		baseContrast: 1.17,
@@ -228,9 +228,9 @@ const versions = {
 		bloomStrength: 0.7,
 		fallSpeed: 0.3,
 		palette: [
-			{ color: hsl(0.6, 0.9, 0.0), at: 0.0 },
-			{ color: hsl(0.6, 1.0, 0.6), at: 0.92 },
-			{ color: hsl(0.6, 1.0, 1.0), at: 1.0 },
+			{ color: hsl(0.375, 0.9, 0.0), at: 0.0 },
+			{ color: hsl(0.375, 1.0, 0.6), at: 0.92 },
+			{ color: hsl(0.375, 1.0, 1.0), at: 1.0 },
 		],
 	},
 	trinity: {
@@ -238,10 +238,10 @@ const versions = {
 		glintTexture: "metal",
 		baseTexture: "pixels",
 		glyphEdgeCrop: 0.1,
-		cursorColor: hsl(0.6, 1, 0.8),
+		cursorColor: hsl(0.292, 1, 0.8),
 		cursorIntensity: 2,
 		isolateGlint: true,
-		glintColor: hsl(0.6, 1, 0.6),
+		glintColor: hsl(0.131, 1, 0.6),
 		glintIntensity: 3,
 		glintBrightness: -0.5,
 		glintContrast: 1.5,
@@ -252,8 +252,8 @@ const versions = {
 		bloomStrength: 0.7,
 		fallSpeed: 0.3,
 		palette: [
-			{ color: hsl(0.6, 0.6, 0.0), at: 0.0 },
-			{ color: hsl(0.6, 0.6, 0.5), at: 1.0 },
+			{ color: hsl(0.37, 0.6, 0.0), at: 0.0 },
+			{ color: hsl(0.37, 0.6, 0.5), at: 1.0 },
 		],
 		cycleSpeed: 0.01,
 		volumetric: true,
@@ -266,10 +266,10 @@ const versions = {
 		glintTexture: "mesh",
 		baseTexture: "metal",
 		glyphEdgeCrop: 0.1,
-		cursorColor: hsl(0.6, 1, 0.85),
+		cursorColor: hsl(0.333, 1, 0.85),
 		cursorIntensity: 2,
 		isolateGlint: true,
-		glintColor: hsl(0.6, 1, 0.5),
+		glintColor: hsl(0.4, 1, 0.5),
 		glintIntensity: 2,
 		glintBrightness: -1.5,
 		glintContrast: 3,
