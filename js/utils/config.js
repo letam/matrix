@@ -168,14 +168,15 @@ const colorSchemes = {
 	},
 	heaven: {
 		palette: [
-			{ color: hsl(0.15, 0.2, 0.9), at: 0.0 },
-			{ color: hsl(0.55, 0.6, 0.85), at: 0.3 },
-			{ color: hsl(0.58, 0.8, 0.9), at: 0.7 },
+			{ color: hsl(0.55, 0.3, 0.1), at: 0.0 },
+			{ color: hsl(0.55, 0.5, 0.5), at: 0.3 },
+			{ color: hsl(0.58, 0.7, 0.8), at: 0.7 },
 			{ color: hsl(0, 0, 1), at: 1.0 },
 		],
 		cursorColor: hsl(0, 0, 1),
-		backgroundColor: hsl(0.55, 0.3, 0.95),
-		cursorIntensity: 1.5,
+		backgroundColor: hsl(0.55, 0.2, 0.05),
+		cursorIntensity: 2,
+		bloomStrength: 0.9,
 	},
 	hell: {
 		palette: [
