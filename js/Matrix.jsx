@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef, memo } from "react";
-import makeConfig from "./utils/config";
+import makeConfig, { defaults } from "./utils/config";
+import { ConfigPanel, useConfigPanel } from "./ui/ConfigPanel.jsx";
+import { ConfigState } from "./ui/configState.js";
 
 /**
  * @typedef {object} Colour
@@ -105,7 +107,7 @@ import makeConfig from "./utils/config";
 
 /** @param {MatrixProps} props */
 export const Matrix = memo((props) => {
-	const { style, className, ...rawConfigProps } = props;
+	const { style, className, showConfigUI = false, onConfigChange, ...rawConfigProps } = props;
 	const elProps = { style, className };
 	const domElement = useRef(null);
 	const [rRenderer, setRenderer] = useState(null);
@@ -194,5 +196,39 @@ export const Matrix = memo((props) => {
 		rRenderer.size = rSize.map((n) => n * rConfig.resolution);
 	}, [rRenderer, rConfig.resolution, rSize]);
 
-	return <div ref={domElement} {...elProps}></div>;
+	// Config UI integration
+	const { showPanel, setShowPanel, ContextMenuComponent } = useConfigPanel(rConfig);
+
+	const handleConfigApply = (newConfig) => {
+		// Update URL parameters (only include values different from defaults)
+		const configState = new ConfigState(newConfig);
+		const params = configState.buildURLParams(newConfig);
+		const url = window.location.pathname + (params.toString() ? "?" + params.toString() : "");
+		window.history.replaceState({}, "", url);
+
+		// Notify parent component if callback provided
+		if (onConfigChange) {
+			onConfigChange(newConfig);
+		} else {
+			// Default behavior: reload page to apply changes
+			window.location.reload();
+		}
+	};
+
+	return (
+		<>
+			<div ref={domElement} {...elProps}></div>
+			{showConfigUI && (
+				<>
+					{ContextMenuComponent}
+					<ConfigPanel
+						initialConfig={rConfig}
+						show={showPanel}
+						onClose={() => setShowPanel(false)}
+						onApply={handleConfigApply}
+					/>
+				</>
+			)}
+		</>
+	);
 });

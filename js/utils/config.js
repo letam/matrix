@@ -694,3 +694,7 @@ export default (urlParams = {}) => {
 
 	return config;
 };
+
+// Export defaults, versions, colorSchemes, colorMaps, and paramMapping for URL parameter comparison
+// Also export paletteFromHue and hsl for computing color map palettes
+export { defaults, versions, colorSchemes, colorMaps, paletteFromHue, hsl, paramMapping };

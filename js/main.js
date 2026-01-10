@@ -1,4 +1,5 @@
 import makeConfig from "./utils/config.js";
+import { initConfigUI } from "./ui/configUI.js";
 
 document.addEventListener("touchmove", (e) => e.preventDefault(), {
 	passive: false,
@@ -42,6 +43,11 @@ document.body.onload = async () => {
 		});
 		document.body.appendChild(renderer.canvas);
 		await renderer.configure(config);
+
+		// Initialize configuration UI
+		if (!config.suppressWarnings) {
+			initConfigUI(config);
+		}
 	};
 
 	if (isRunningSwiftShader() && !config.suppressWarnings) {
