@@ -46,7 +46,7 @@ document.body.onload = async () => {
 
 		// Initialize configuration UI
 		if (!config.suppressWarnings) {
-			initConfigUI(config);
+			initConfigUI(config, renderer);
 		}
 	};
 

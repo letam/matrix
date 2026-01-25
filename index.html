@@ -400,6 +400,44 @@
 				font-size: 0.75rem;
 				margin-left: 6px;
 			}
+
+			/* Pause Button */
+			.pause-button {
+				position: fixed;
+				bottom: 20px;
+				left: 20px;
+				width: 48px;
+				height: 48px;
+				background: rgba(0, 0, 0, 0.7);
+				border: 2px solid rgba(0, 255, 0, 0.5);
+				border-radius: 50%;
+				color: #0f0;
+				font-size: 1.2rem;
+				cursor: pointer;
+				z-index: 9998;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: all 0.2s;
+				opacity: 0.6;
+			}
+
+			.pause-button:hover {
+				opacity: 1;
+				border-color: #0f0;
+				box-shadow: 0 0 12px rgba(0, 255, 0, 0.5);
+			}
+
+			.pause-button.paused {
+				border-color: #f80;
+				color: #f80;
+			}
+
+			.pause-button.paused:hover {
+				border-color: #fa0;
+				color: #fa0;
+				box-shadow: 0 0 12px rgba(255, 136, 0, 0.5);
+			}
 		</style>
 	</head>
 	<body>

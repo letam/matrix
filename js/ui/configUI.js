@@ -9,17 +9,22 @@ import { ConfigPanel } from "./configPanel.js";
 
 let contextMenu = null;
 let configPanel = null;
+let pauseButton = null;
+let renderer = null;
 let isInitialized = false;
 
 /**
  * Initialize the configuration UI system
  * @param {Object} config - Current configuration object
+ * @param {Object} rendererInstance - The renderer instance to control
  */
-export function initConfigUI(config) {
+export function initConfigUI(config, rendererInstance) {
 	if (isInitialized) {
 		console.warn("Config UI already initialized");
 		return;
 	}
+
+	renderer = rendererInstance;
 
 	// Create context menu
 	contextMenu = new ContextMenu();
@@ -31,6 +36,10 @@ export function initConfigUI(config) {
 	const panelEl = configPanel.create();
 	document.body.appendChild(panelEl);
 
+	// Create pause button
+	pauseButton = createPauseButton();
+	document.body.appendChild(pauseButton);
+
 	// Wire up context menu to open panel
 	contextMenu.onOpenSettings = () => {
 		configPanel.show();
@@ -40,6 +49,40 @@ export function initConfigUI(config) {
 	setupEventListeners();
 
 	isInitialized = true;
+}
+
+/**
+ * Create the pause/play button
+ * @returns {HTMLElement} The button element
+ */
+function createPauseButton() {
+	const button = document.createElement("button");
+	button.className = "pause-button";
+	button.innerHTML = "⏸";
+	button.title = "Pause/Play (Space)";
+
+	button.addEventListener("click", () => {
+		togglePause();
+	});
+
+	return button;
+}
+
+/**
+ * Toggle pause state
+ */
+function togglePause() {
+	if (!renderer) return;
+
+	if (renderer.running) {
+		renderer.stop();
+		pauseButton.innerHTML = "▶";
+		pauseButton.classList.add("paused");
+	} else {
+		renderer.start();
+		pauseButton.innerHTML = "⏸";
+		pauseButton.classList.remove("paused");
+	}
 }
 
 /**
@@ -73,7 +116,7 @@ function setupEventListeners() {
 		}
 	});
 
-	// Escape key to close panel
+	// Keyboard shortcuts
 	document.addEventListener("keydown", (e) => {
 		if (e.key === "Escape") {
 			if (configPanel && configPanel.isVisible()) {
@@ -83,6 +126,11 @@ function setupEventListeners() {
 				contextMenu.hide();
 				e.preventDefault();
 			}
+		}
+		// Spacebar to toggle pause (only when not in an input field)
+		if (e.key === " " && !["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName)) {
+			togglePause();
+			e.preventDefault();
 		}
 	});
 
@@ -137,5 +185,11 @@ export function destroyConfigUI() {
 		configPanel = null;
 	}
 
+	if (pauseButton && pauseButton.parentNode) {
+		pauseButton.parentNode.removeChild(pauseButton);
+		pauseButton = null;
+	}
+
+	renderer = null;
 	isInitialized = false;
 }

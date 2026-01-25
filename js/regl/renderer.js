@@ -129,7 +129,6 @@ export default class REGLRenderer extends Renderer {
 
 	stop() {
 		super.stop();
-		this.#renderFunc = null;
 	}
 
 	update(now) {
