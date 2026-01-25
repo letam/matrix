@@ -1,6 +1,9 @@
 import { loadText, makePassFBO, makePass } from "./utils.js";
 
-export default ({ regl, canvas, cache, config, cameraTex, cameraAspectRatio }, inputs) => {
+export default (
+	{ regl, canvas, cache, config, cameraTex, cameraAspectRatio, getPausedTime },
+	inputs,
+) => {
 	let start;
 	const numClicks = 5;
 	const clicks = Array(numClicks)
@@ -22,7 +25,7 @@ export default ({ regl, canvas, cache, config, cameraTex, cameraAspectRatio }, i
 	const render = regl({
 		frag: regl.prop("frag"),
 		uniforms: {
-			time: regl.context("time"),
+			time: (ctx) => ctx.time - (getPausedTime ? getPausedTime() : 0),
 			tex: inputs.primary,
 			bloomTex: inputs.bloom,
 			cameraTex,

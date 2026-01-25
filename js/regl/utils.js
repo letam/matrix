@@ -116,7 +116,7 @@ const loadText = (cache, url) => {
 	return resource;
 };
 
-const makeFullScreenQuad = (regl, uniforms = {}, context = {}) =>
+const makeFullScreenQuad = (regl, uniforms = {}, context = {}, getPausedTime = () => 0) =>
 	regl({
 		vert: `
 		precision mediump float;
@@ -144,7 +144,7 @@ const makeFullScreenQuad = (regl, uniforms = {}, context = {}) =>
 
 		uniforms: {
 			...uniforms,
-			time: regl.context("time"),
+			time: (ctx) => ctx.time - getPausedTime(),
 			tick: regl.context("tick"),
 		},
 

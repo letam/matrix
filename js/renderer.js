@@ -11,6 +11,8 @@ export default class Renderer {
 	#cache = new Map();
 	#destroyed = false;
 	#running = false;
+	#pausedTime = 0;
+	#pauseStartTime = null;
 
 	constructor(type, ready) {
 		this.#type = type;
@@ -27,13 +29,22 @@ export default class Renderer {
 		return this.#running;
 	}
 
+	get pausedTime() {
+		return this.#pausedTime;
+	}
+
 	start() {
+		if (this.#pauseStartTime !== null) {
+			this.#pausedTime += (performance.now() / 1000) - this.#pauseStartTime;
+			this.#pauseStartTime = null;
+		}
 		this.#running = true;
 		this.update();
 	}
 
 	stop() {
 		this.#running = false;
+		this.#pauseStartTime = performance.now() / 1000;
 	}
 
 	update(now) {

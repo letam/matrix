@@ -62,9 +62,10 @@ export default class REGLRenderer extends Renderer {
 		const cameraTex = regl.texture(cameraCanvas);
 
 		// All this takes place in a full screen quad.
-		const fullScreenQuad = makeFullScreenQuad(regl);
+		const getPausedTime = () => this.pausedTime;
+		const fullScreenQuad = makeFullScreenQuad(regl, {}, {}, getPausedTime);
 		const effectName = config.effect in effects ? config.effect : "palette";
-		const context = { regl, canvas, cache, config, cameraTex, cameraAspectRatio, glMatrix };
+		const context = { regl, canvas, cache, config, cameraTex, cameraAspectRatio, glMatrix, getPausedTime };
 		const pipeline = makePipeline(context, [makeRain, makeBloomPass, effects[effectName]]);
 
 		const screenUniforms = { tex: pipeline[pipeline.length - 1].outputs.primary };
