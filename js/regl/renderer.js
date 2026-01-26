@@ -51,6 +51,10 @@ export default class REGLRenderer extends Renderer {
 	async configure(config) {
 		await super.configure(config);
 
+		if (config.rainStopEffect != null) {
+			this.rainStopEffect = config.rainStopEffect;
+		}
+
 		if (config.useCamera) {
 			await setupCamera();
 		}

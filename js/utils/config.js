@@ -601,6 +601,7 @@ const paramMapping = {
 	suppressWarnings: { key: "suppressWarnings", parser: isTrue },
 	once: { key: "once", parser: isTrue },
 	isometric: { key: "isometric", parser: isTrue },
+	rainStopEffect: { key: "rainStopEffect", parser: (s) => nullNaN(parseInt(s)) },
 	colorMap: {
 		key: "colorMap",
 		parser: (s) => (s in colorMaps ? s : null),
