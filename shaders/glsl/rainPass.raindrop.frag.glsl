@@ -101,6 +101,27 @@ vec4 computeResult(float simTime, bool isFirstFrame, vec2 glyphPos, vec4 previou
 			float cycleNow = floor(columnTimeNow / raindropLength);
 
 			shouldFade = cycleNow > cycleAtStop;
+		} else if (rainStopEffect == 2) {
+			// Effect 2: Wait for tail to pass bottom - check cycle at Y=0 (bottom of screen)
+			float stopSimTime = rainStopTime * animationSpeed;
+
+			float columnTimeOffset = randomFloat(vec2(glyphPos.x, 0.)) * 1000.;
+			float columnSpeedOffset = randomFloat(vec2(glyphPos.x + 0.1, 0.)) * 0.5 + 0.5;
+			if (loops) {
+				columnSpeedOffset = 0.5;
+			}
+
+			float columnTimeAtStop = columnTimeOffset + stopSimTime * fallSpeed * columnSpeedOffset;
+			float columnTimeNow = columnTimeOffset + simTime * fallSpeed * columnSpeedOffset;
+
+			// Use Y=0 (bottom of screen) to check when tail has passed
+			float rainTimeAtStopBottom = (0.0 * 0.01 + columnTimeAtStop) / raindropLength;
+			float rainTimeNowBottom = (0.0 * 0.01 + columnTimeNow) / raindropLength;
+
+			float cycleAtStop = floor(rainTimeAtStopBottom);
+			float cycleNow = floor(rainTimeNowBottom);
+
+			shouldFade = cycleNow > cycleAtStop;
 		} else {
 			// Effect 0: Per-glyph cycle - each stream completes individually
 			float stopSimTime = rainStopTime * animationSpeed;
