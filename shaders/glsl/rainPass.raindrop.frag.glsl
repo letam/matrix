@@ -79,16 +79,27 @@ vec4 computeResult(float simTime, bool isFirstFrame, vec2 glyphPos, vec4 previou
 		brightness = mix(previousBrightness, brightness, brightnessDecay);
 	}
 
-	// When rain is stopped, create a cutoff that moves down the screen
-	// Glyphs above the cutoff fade out, letting existing rain "fall off" the bottom
+	// When rain is stopped, let existing streams complete but prevent new ones
+	// Each column has its own cycle - suppress streams that started after the stop
 	if (rainStopped && rainStopTime >= 0.0) {
-		float timeSinceStop = simTime - rainStopTime * animationSpeed;
-		// Cutoff moves down at fall speed - normalized to screen position (0 = top, 1 = bottom)
-		float cutoffPosition = timeSinceStop * fallSpeed * 0.5;
-		float glyphYNormalized = 1.0 - (glyphPos.y / numRows);
+		float stopSimTime = rainStopTime * animationSpeed;
 
-		// If this glyph is above the cutoff, fade it out
-		if (glyphYNormalized < cutoffPosition) {
+		// Calculate the rain cycle for this column (same logic as getRainBrightness)
+		float columnTimeOffset = randomFloat(vec2(glyphPos.x, 0.)) * 1000.;
+		float columnSpeedOffset = randomFloat(vec2(glyphPos.x + 0.1, 0.)) * 0.5 + 0.5;
+		if (loops) {
+			columnSpeedOffset = 0.5;
+		}
+
+		// Calculate which cycle we were in when rain stopped vs now
+		float columnTimeAtStop = columnTimeOffset + stopSimTime * fallSpeed * columnSpeedOffset;
+		float columnTimeNow = columnTimeOffset + simTime * fallSpeed * columnSpeedOffset;
+
+		float cycleAtStop = floor(columnTimeAtStop / raindropLength);
+		float cycleNow = floor(columnTimeNow / raindropLength);
+
+		// If we're in a new cycle that started after the stop, fade out
+		if (cycleNow > cycleAtStop) {
 			brightness = mix(previous.r, 0.0, brightnessDecay);
 			cursor = false;
 			activated = false;
