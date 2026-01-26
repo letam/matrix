@@ -30,7 +30,7 @@ const blVert = [1, 0];
 const brVert = [1, 1];
 const quadVertices = [tlVert, trVert, brVert, tlVert, brVert, blVert];
 
-export default ({ regl, cache, config, glMatrix }) => {
+export default ({ regl, cache, config, glMatrix, isRainStopped, getRainStopTime }) => {
 	const { mat4, vec3 } = glMatrix;
 	// The volumetric mode multiplies the number of columns
 	// to reach the desired density, and then overlaps them
@@ -98,6 +98,8 @@ export default ({ regl, cache, config, glMatrix }) => {
 			...raindropUniforms,
 			introState: introDoubleBuffer.front,
 			previousRaindropState: raindropDoubleBuffer.back,
+			rainStopped: () => (isRainStopped ? isRainStopped() : false),
+			rainStopTime: () => (getRainStopTime ? getRainStopTime() : -1.0),
 		},
 
 		framebuffer: raindropDoubleBuffer.front,
@@ -302,6 +304,13 @@ export default ({ regl, cache, config, glMatrix }) => {
 					glyphTransform: [1, 0, 0, 1],
 				});
 			}
+		},
+		() => {
+			// Reset all double buffers to restart the rain animation
+			introDoubleBuffer.clear();
+			raindropDoubleBuffer.clear();
+			symbolDoubleBuffer.clear();
+			effectDoubleBuffer.clear();
 		},
 	);
 };

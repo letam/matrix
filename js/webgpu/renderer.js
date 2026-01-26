@@ -168,7 +168,10 @@ export default class REGLRenderer extends Renderer {
 				device.queue.writeBuffer(
 					timeBuffer,
 					0,
-					timeUniforms.toBuffer({ seconds: (now - start) / 1000 - this.pausedTime, frames }),
+					timeUniforms.toBuffer({
+						seconds: this.getRainTime((now - start) / 1000 - this.pausedTime),
+						frames,
+					}),
 				);
 				frames++;
 

@@ -13,6 +13,9 @@ export default class Renderer {
 	#running = false;
 	#pausedTime = 0;
 	#pauseStartTime = null;
+	#rainTimeOffset = 0;
+	#rainStopped = false;
+	#rainStopTime = -1;
 
 	constructor(type, ready) {
 		this.#type = type;
@@ -33,9 +36,63 @@ export default class Renderer {
 		return this.#pausedTime;
 	}
 
+	get rainStopped() {
+		return this.#rainStopped;
+	}
+
+	get rainStopTime() {
+		return this.#rainStopTime;
+	}
+
+	/**
+	 * Get the effective time offset for rain animation.
+	 * This accounts for rain-specific resets.
+	 * @param {number} currentTime - The current animation time (after pausedTime subtraction)
+	 * @returns {number} The time to use for rain calculations
+	 */
+	getRainTime(currentTime) {
+		// Time keeps advancing even when stopped (shader handles fade)
+		return currentTime - this.#rainTimeOffset;
+	}
+
+	/**
+	 * Stop rain from falling (existing rain continues to bottom, no new rain starts)
+	 */
+	stopRain() {
+		if (!this.#rainStopped) {
+			this.#rainStopped = true;
+			// Record the time when rain was stopped (in rain time units)
+			const currentTime = performance.now() / 1000 - this.#pausedTime;
+			this.#rainStopTime = currentTime - this.#rainTimeOffset;
+		}
+	}
+
+	/**
+	 * Start/restart rain
+	 * @param {boolean} reset - If true, reset to beginning with intro animation
+	 */
+	startRain(reset = false) {
+		if (reset) {
+			// Reset rain time to 0 by setting offset to current time
+			const currentTime = performance.now() / 1000 - this.#pausedTime;
+			this.#rainTimeOffset = currentTime;
+			// Subclasses should override to also clear buffers
+			this._resetRainBuffers();
+		}
+		this.#rainStopped = false;
+		this.#rainStopTime = -1;
+	}
+
+	/**
+	 * Override in subclass to clear rain buffers
+	 */
+	_resetRainBuffers() {
+		// Base implementation does nothing
+	}
+
 	start() {
 		if (this.#pauseStartTime !== null) {
-			this.#pausedTime += (performance.now() / 1000) - this.#pauseStartTime;
+			this.#pausedTime += performance.now() / 1000 - this.#pauseStartTime;
 			this.#pauseStartTime = null;
 		}
 		this.#running = true;

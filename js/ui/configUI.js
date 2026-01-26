@@ -10,6 +10,7 @@ import { ConfigPanel } from "./configPanel.js";
 let contextMenu = null;
 let configPanel = null;
 let pauseButton = null;
+let rainButton = null;
 let renderer = null;
 let isInitialized = false;
 
@@ -39,6 +40,10 @@ export function initConfigUI(config, rendererInstance) {
 	// Create pause button
 	pauseButton = createPauseButton();
 	document.body.appendChild(pauseButton);
+
+	// Create rain control button
+	rainButton = createRainButton();
+	document.body.appendChild(rainButton);
 
 	// Wire up context menu to open panel
 	contextMenu.onOpenSettings = () => {
@@ -82,6 +87,42 @@ function togglePause() {
 		renderer.start();
 		pauseButton.innerHTML = "⏸";
 		pauseButton.classList.remove("paused");
+	}
+}
+
+/**
+ * Create the rain stop/start button
+ * @returns {HTMLElement} The button element
+ */
+function createRainButton() {
+	const button = document.createElement("button");
+	button.className = "rain-button";
+	button.innerHTML = "🌧";
+	button.title = "Stop/Start Rain (R)";
+
+	button.addEventListener("click", () => {
+		toggleRain();
+	});
+
+	return button;
+}
+
+/**
+ * Toggle rain state - stops rain or restarts with intro
+ */
+function toggleRain() {
+	if (!renderer) return;
+
+	if (renderer.rainStopped) {
+		// Restart rain with intro animation
+		renderer.startRain(true);
+		rainButton.innerHTML = "🌧";
+		rainButton.classList.remove("stopped");
+	} else {
+		// Stop rain
+		renderer.stopRain();
+		rainButton.innerHTML = "☀";
+		rainButton.classList.add("stopped");
 	}
 }
 
@@ -130,6 +171,11 @@ function setupEventListeners() {
 		// Spacebar to toggle pause (only when not in an input field)
 		if (e.key === " " && !["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName)) {
 			togglePause();
+			e.preventDefault();
+		}
+		// R to toggle rain (only when not in an input field)
+		if (e.key === "r" && !["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName)) {
+			toggleRain();
 			e.preventDefault();
 		}
 	});
@@ -188,6 +234,11 @@ export function destroyConfigUI() {
 	if (pauseButton && pauseButton.parentNode) {
 		pauseButton.parentNode.removeChild(pauseButton);
 		pauseButton = null;
+	}
+
+	if (rainButton && rainButton.parentNode) {
+		rainButton.parentNode.removeChild(rainButton);
+		rainButton = null;
 	}
 
 	renderer = null;

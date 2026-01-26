@@ -21,9 +21,10 @@ uniform float numColumns, numRows;
 uniform float time, tick;
 uniform float animationSpeed, fallSpeed;
 
-uniform bool loops, skipIntro;
+uniform bool loops, skipIntro, rainStopped;
 uniform float brightnessDecay;
 uniform float raindropLength;
+uniform float rainStopTime;
 
 // Helper functions for generating randomness, borrowed from elsewhere
 
@@ -76,6 +77,22 @@ vec4 computeResult(float simTime, bool isFirstFrame, vec2 glyphPos, vec4 previou
 	if (!isFirstFrame) {
 		float previousBrightness = previous.r;
 		brightness = mix(previousBrightness, brightness, brightnessDecay);
+	}
+
+	// When rain is stopped, create a cutoff that moves down the screen
+	// Glyphs above the cutoff fade out, letting existing rain "fall off" the bottom
+	if (rainStopped && rainStopTime >= 0.0) {
+		float timeSinceStop = simTime - rainStopTime * animationSpeed;
+		// Cutoff moves down at fall speed - normalized to screen position (0 = top, 1 = bottom)
+		float cutoffPosition = timeSinceStop * fallSpeed * 0.5;
+		float glyphYNormalized = 1.0 - (glyphPos.y / numRows);
+
+		// If this glyph is above the cutoff, fade it out
+		if (glyphYNormalized < cutoffPosition) {
+			brightness = mix(previous.r, 0.0, brightnessDecay);
+			cursor = false;
+			activated = false;
+		}
 	}
 
 	vec4 result = vec4(brightness, cursor, activated, introProgress);

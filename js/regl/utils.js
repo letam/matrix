@@ -23,6 +23,14 @@ const makeDoubleBuffer = (regl, props) => {
 	return {
 		front: ({ tick }) => state[tick % 2],
 		back: ({ tick }) => state[(tick + 1) % 2],
+		clear: () => {
+			state.forEach((fbo) => {
+				regl.clear({
+					color: [0, 0, 0, 0],
+					framebuffer: fbo,
+				});
+			});
+		},
 	};
 };
 
@@ -116,7 +124,7 @@ const loadText = (cache, url) => {
 	return resource;
 };
 
-const makeFullScreenQuad = (regl, uniforms = {}, context = {}, getPausedTime = () => 0) =>
+const makeFullScreenQuad = (regl, uniforms = {}, context = {}, getRainTime = (t) => t) =>
 	regl({
 		vert: `
 		precision mediump float;
@@ -144,7 +152,7 @@ const makeFullScreenQuad = (regl, uniforms = {}, context = {}, getPausedTime = (
 
 		uniforms: {
 			...uniforms,
-			time: (ctx) => ctx.time - getPausedTime(),
+			time: (ctx) => getRainTime(ctx.time),
 			tick: regl.context("tick"),
 		},
 
@@ -165,11 +173,12 @@ const make1DTexture = (regl, rgbas) => {
 	});
 };
 
-const makePass = (outputs, ready, setSize, execute) => ({
+const makePass = (outputs, ready, setSize, execute, reset) => ({
 	outputs: outputs ?? {},
 	ready: ready ?? Promise.resolve(),
 	setSize: setSize ?? (() => {}),
 	execute: execute ?? (() => {}),
+	reset: reset ?? (() => {}),
 });
 
 const makePipeline = (context, steps) =>

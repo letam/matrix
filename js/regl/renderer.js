@@ -26,6 +26,7 @@ export default class REGLRenderer extends Renderer {
 	#renderFunc;
 	#regl;
 	#glMatrix;
+	#pipeline;
 
 	constructor() {
 		super("regl", async () => {
@@ -62,11 +63,25 @@ export default class REGLRenderer extends Renderer {
 		const cameraTex = regl.texture(cameraCanvas);
 
 		// All this takes place in a full screen quad.
-		const getPausedTime = () => this.pausedTime;
-		const fullScreenQuad = makeFullScreenQuad(regl, {}, {}, getPausedTime);
+		const getRainTime = (t) => this.getRainTime(t - this.pausedTime);
+		const isRainStopped = () => this.rainStopped;
+		const getRainStopTime = () => this.rainStopTime;
+		const fullScreenQuad = makeFullScreenQuad(regl, {}, {}, getRainTime);
 		const effectName = config.effect in effects ? config.effect : "palette";
-		const context = { regl, canvas, cache, config, cameraTex, cameraAspectRatio, glMatrix, getPausedTime };
+		const context = {
+			regl,
+			canvas,
+			cache,
+			config,
+			cameraTex,
+			cameraAspectRatio,
+			glMatrix,
+			getRainTime,
+			isRainStopped,
+			getRainStopTime,
+		};
 		const pipeline = makePipeline(context, [makeRain, makeBloomPass, effects[effectName]]);
+		this.#pipeline = pipeline;
 
 		const screenUniforms = { tex: pipeline[pipeline.length - 1].outputs.primary };
 		const drawToScreen = regl({ uniforms: screenUniforms });
@@ -130,6 +145,12 @@ export default class REGLRenderer extends Renderer {
 
 	stop() {
 		super.stop();
+	}
+
+	_resetRainBuffers() {
+		if (this.#pipeline && this.#pipeline[0]) {
+			this.#pipeline[0].reset();
+		}
 	}
 
 	update(now) {
