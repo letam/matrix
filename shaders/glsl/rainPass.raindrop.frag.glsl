@@ -85,11 +85,22 @@ vec4 computeResult(float simTime, bool isFirstFrame, vec2 glyphPos, vec4 previou
 		bool shouldFade = false;
 
 		if (rainStopEffect == 1) {
-			// Effect 1: Uniform cutoff - a line moves down the screen
-			float timeSinceStop = simTime - rainStopTime * animationSpeed;
-			float cutoffPosition = timeSinceStop * fallSpeed * 0.5;
-			float glyphYNormalized = 1.0 - (glyphPos.y / numRows);
-			shouldFade = glyphYNormalized < cutoffPosition;
+			// Effect 1: Per-column cycle - entire column fades when its cycle completes
+			float stopSimTime = rainStopTime * animationSpeed;
+
+			float columnTimeOffset = randomFloat(vec2(glyphPos.x, 0.)) * 1000.;
+			float columnSpeedOffset = randomFloat(vec2(glyphPos.x + 0.1, 0.)) * 0.5 + 0.5;
+			if (loops) {
+				columnSpeedOffset = 0.5;
+			}
+
+			float columnTimeAtStop = columnTimeOffset + stopSimTime * fallSpeed * columnSpeedOffset;
+			float columnTimeNow = columnTimeOffset + simTime * fallSpeed * columnSpeedOffset;
+
+			float cycleAtStop = floor(columnTimeAtStop / raindropLength);
+			float cycleNow = floor(columnTimeNow / raindropLength);
+
+			shouldFade = cycleNow > cycleAtStop;
 		} else {
 			// Effect 0: Per-glyph cycle - each stream completes individually
 			float stopSimTime = rainStopTime * animationSpeed;
