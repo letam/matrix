@@ -44,6 +44,9 @@ document.body.onload = async () => {
 		document.body.appendChild(renderer.canvas);
 		await renderer.configure(config);
 
+		// Expose renderer globally for console access
+		window.renderer = renderer;
+
 		// Initialize configuration UI
 		if (!config.suppressWarnings) {
 			initConfigUI(config, renderer);
