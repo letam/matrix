@@ -25,7 +25,7 @@ uniform bool loops, skipIntro, rainStopped;
 uniform float brightnessDecay;
 uniform float raindropLength;
 uniform float rainStopTime;
-uniform int rainStopEffect; // 0 = per-glyph cycle, 1 = uniform cutoff
+uniform int rainStopEffect; // 0 = per-glyph cycle, 1 = per-column cycle, 2 = bottom-up, 3 = top-down
 
 // Helper functions for generating randomness, borrowed from elsewhere
 
@@ -87,7 +87,7 @@ vec4 computeResult(float simTime, bool isFirstFrame, vec2 glyphPos, vec4 previou
 	// Effect 0: Per-glyph cycle - fades when each glyph enters new cycle (top-down staggered)
 	// Effect 1: Per-column cycle - entire column fades together when cycle completes
 	// Effect 2: Bottom-to-top wipe - lower glyphs fade first, sweeps upward
-	// Effect 3: Top-to-bottom wipe - upper glyphs fade first, streams "fall off" bottom
+	// Effect 3: Top-to-bottom - streams fall to bottom without fading prematurely
 	// ============================================================
 	if (rainStopped && rainStopTime >= 0.0) {
 		bool shouldFade = false;
@@ -117,8 +117,8 @@ vec4 computeResult(float simTime, bool isFirstFrame, vec2 glyphPos, vec4 previou
 			shouldFade = timeSinceStop > timeToReachBottom;
 
 		} else if (rainStopEffect == 3) {
-			// EFFECT 3: Top-to-bottom wipe
-			// Upper glyphs fade first, streams appear to "fall off" bottom
+			// EFFECT 3: Top-to-bottom
+			// Streams fall to bottom without fading prematurely
 			float timeToFade = (numRows - glyphPos.y) * 0.01;
 			shouldFade = timeSinceStop > timeToFade;
 
