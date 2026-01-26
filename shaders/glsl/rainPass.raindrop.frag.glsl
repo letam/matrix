@@ -80,84 +80,55 @@ vec4 computeResult(float simTime, bool isFirstFrame, vec2 glyphPos, vec4 previou
 		brightness = mix(previousBrightness, brightness, brightnessDecay);
 	}
 
-	// When rain is stopped, prevent new rain based on selected effect
+	// ============================================================
+	// RAIN STOP EFFECTS
+	// Controls how rain fades when stopped (renderer.rainStopEffect)
+	// ------------------------------------------------------------
+	// Effect 0: Per-glyph cycle - fades when each glyph enters new cycle (top-down staggered)
+	// Effect 1: Per-column cycle - entire column fades together when cycle completes
+	// Effect 2: Bottom-to-top wipe - lower glyphs fade first, sweeps upward
+	// Effect 3: Top-to-bottom wipe - upper glyphs fade first, streams "fall off" bottom
+	// ============================================================
 	if (rainStopped && rainStopTime >= 0.0) {
 		bool shouldFade = false;
+		float stopSimTime = rainStopTime * animationSpeed;
+
+		// Common column timing calculations
+		float columnTimeOffset = randomFloat(vec2(glyphPos.x, 0.)) * 1000.;
+		float columnSpeedOffset = randomFloat(vec2(glyphPos.x + 0.1, 0.)) * 0.5 + 0.5;
+		if (loops) {
+			columnSpeedOffset = 0.5;
+		}
+		float columnTimeAtStop = columnTimeOffset + stopSimTime * fallSpeed * columnSpeedOffset;
+		float columnTimeNow = columnTimeOffset + simTime * fallSpeed * columnSpeedOffset;
+		float timeSinceStop = columnTimeNow - columnTimeAtStop;
 
 		if (rainStopEffect == 1) {
-			// Effect 1: Per-column cycle - entire column fades when its cycle completes
-			float stopSimTime = rainStopTime * animationSpeed;
-
-			float columnTimeOffset = randomFloat(vec2(glyphPos.x, 0.)) * 1000.;
-			float columnSpeedOffset = randomFloat(vec2(glyphPos.x + 0.1, 0.)) * 0.5 + 0.5;
-			if (loops) {
-				columnSpeedOffset = 0.5;
-			}
-
-			float columnTimeAtStop = columnTimeOffset + stopSimTime * fallSpeed * columnSpeedOffset;
-			float columnTimeNow = columnTimeOffset + simTime * fallSpeed * columnSpeedOffset;
-
+			// EFFECT 1: Per-column cycle
+			// Entire column fades when its rain cycle completes
 			float cycleAtStop = floor(columnTimeAtStop / raindropLength);
 			float cycleNow = floor(columnTimeNow / raindropLength);
-
 			shouldFade = cycleNow > cycleAtStop;
+
 		} else if (rainStopEffect == 2) {
-			// Effect 2: Bottom-to-top fade - lower glyphs fade first
-			float stopSimTime = rainStopTime * animationSpeed;
-
-			float columnTimeOffset = randomFloat(vec2(glyphPos.x, 0.)) * 1000.;
-			float columnSpeedOffset = randomFloat(vec2(glyphPos.x + 0.1, 0.)) * 0.5 + 0.5;
-			if (loops) {
-				columnSpeedOffset = 0.5;
-			}
-
-			float columnTimeAtStop = columnTimeOffset + stopSimTime * fallSpeed * columnSpeedOffset;
-			float columnTimeNow = columnTimeOffset + simTime * fallSpeed * columnSpeedOffset;
-
-			float timeSinceStop = columnTimeNow - columnTimeAtStop;
+			// EFFECT 2: Bottom-to-top wipe
+			// Lower glyphs fade first, creating upward sweep
 			float timeToReachBottom = glyphPos.y * 0.01;
-
 			shouldFade = timeSinceStop > timeToReachBottom;
-		} else if (rainStopEffect == 4) {
-			// Effect 4: Top-to-bottom fade - upper glyphs fade first, streams "fall off" bottom
-			float stopSimTime = rainStopTime * animationSpeed;
 
-			float columnTimeOffset = randomFloat(vec2(glyphPos.x, 0.)) * 1000.;
-			float columnSpeedOffset = randomFloat(vec2(glyphPos.x + 0.1, 0.)) * 0.5 + 0.5;
-			if (loops) {
-				columnSpeedOffset = 0.5;
-			}
-
-			float columnTimeAtStop = columnTimeOffset + stopSimTime * fallSpeed * columnSpeedOffset;
-			float columnTimeNow = columnTimeOffset + simTime * fallSpeed * columnSpeedOffset;
-
-			float timeSinceStop = columnTimeNow - columnTimeAtStop;
-			// Invert: top glyphs (high Y) fade first, bottom glyphs (low Y) fade last
+		} else if (rainStopEffect == 3) {
+			// EFFECT 3: Top-to-bottom wipe
+			// Upper glyphs fade first, streams appear to "fall off" bottom
 			float timeToFade = (numRows - glyphPos.y) * 0.01;
-
 			shouldFade = timeSinceStop > timeToFade;
+
 		} else {
-			// Effect 0: Per-glyph cycle - each stream completes individually
-			float stopSimTime = rainStopTime * animationSpeed;
-
-			// Calculate the rain time for this specific glyph (same logic as getRainBrightness)
-			float columnTimeOffset = randomFloat(vec2(glyphPos.x, 0.)) * 1000.;
-			float columnSpeedOffset = randomFloat(vec2(glyphPos.x + 0.1, 0.)) * 0.5 + 0.5;
-			if (loops) {
-				columnSpeedOffset = 0.5;
-			}
-
-			// Include Y position in the calculation - this is what makes streams "fall"
-			float columnTimeAtStop = columnTimeOffset + stopSimTime * fallSpeed * columnSpeedOffset;
-			float columnTimeNow = columnTimeOffset + simTime * fallSpeed * columnSpeedOffset;
-
-			// rainTime includes Y position offset - higher Y = earlier in the cycle at any given moment
+			// EFFECT 0 (default): Per-glyph cycle
+			// Each glyph fades when it enters a new rain cycle (includes Y position)
 			float rainTimeAtStop = (glyphPos.y * 0.01 + columnTimeAtStop) / raindropLength;
 			float rainTimeNow = (glyphPos.y * 0.01 + columnTimeNow) / raindropLength;
-
 			float cycleAtStop = floor(rainTimeAtStop);
 			float cycleNow = floor(rainTimeNow);
-
 			shouldFade = cycleNow > cycleAtStop;
 		}
 
