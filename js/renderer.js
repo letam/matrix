@@ -16,6 +16,7 @@ export default class Renderer {
 	#rainTimeOffset = 0;
 	#rainStopped = false;
 	#rainStopTime = -1;
+	#rainStopEffect = 0; // 0 = per-glyph cycle, 1 = uniform cutoff
 
 	constructor(type, ready) {
 		this.#type = type;
@@ -42,6 +43,14 @@ export default class Renderer {
 
 	get rainStopTime() {
 		return this.#rainStopTime;
+	}
+
+	get rainStopEffect() {
+		return this.#rainStopEffect;
+	}
+
+	set rainStopEffect(value) {
+		this.#rainStopEffect = value;
 	}
 
 	/**

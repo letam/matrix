@@ -30,7 +30,15 @@ const blVert = [1, 0];
 const brVert = [1, 1];
 const quadVertices = [tlVert, trVert, brVert, tlVert, brVert, blVert];
 
-export default ({ regl, cache, config, glMatrix, isRainStopped, getRainStopTime }) => {
+export default ({
+	regl,
+	cache,
+	config,
+	glMatrix,
+	isRainStopped,
+	getRainStopTime,
+	getRainStopEffect,
+}) => {
 	const { mat4, vec3 } = glMatrix;
 	// The volumetric mode multiplies the number of columns
 	// to reach the desired density, and then overlaps them
@@ -100,6 +108,7 @@ export default ({ regl, cache, config, glMatrix, isRainStopped, getRainStopTime 
 			previousRaindropState: raindropDoubleBuffer.back,
 			rainStopped: () => (isRainStopped ? isRainStopped() : false),
 			rainStopTime: () => (getRainStopTime ? getRainStopTime() : -1.0),
+			rainStopEffect: () => (getRainStopEffect ? getRainStopEffect() : 0),
 		},
 
 		framebuffer: raindropDoubleBuffer.front,

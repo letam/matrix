@@ -66,6 +66,7 @@ export default class REGLRenderer extends Renderer {
 		const getRainTime = (t) => this.getRainTime(t - this.pausedTime);
 		const isRainStopped = () => this.rainStopped;
 		const getRainStopTime = () => this.rainStopTime;
+		const getRainStopEffect = () => this.rainStopEffect;
 		const fullScreenQuad = makeFullScreenQuad(regl, {}, {}, getRainTime);
 		const effectName = config.effect in effects ? config.effect : "palette";
 		const context = {
@@ -79,6 +80,7 @@ export default class REGLRenderer extends Renderer {
 			getRainTime,
 			isRainStopped,
 			getRainStopTime,
+			getRainStopEffect,
 		};
 		const pipeline = makePipeline(context, [makeRain, makeBloomPass, effects[effectName]]);
 		this.#pipeline = pipeline;

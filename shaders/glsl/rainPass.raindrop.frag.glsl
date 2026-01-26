@@ -25,6 +25,7 @@ uniform bool loops, skipIntro, rainStopped;
 uniform float brightnessDecay;
 uniform float raindropLength;
 uniform float rainStopTime;
+uniform int rainStopEffect; // 0 = per-glyph cycle, 1 = uniform cutoff
 
 // Helper functions for generating randomness, borrowed from elsewhere
 
@@ -79,27 +80,42 @@ vec4 computeResult(float simTime, bool isFirstFrame, vec2 glyphPos, vec4 previou
 		brightness = mix(previousBrightness, brightness, brightnessDecay);
 	}
 
-	// When rain is stopped, let existing streams complete but prevent new ones
-	// Each column has its own cycle - suppress streams that started after the stop
+	// When rain is stopped, prevent new rain based on selected effect
 	if (rainStopped && rainStopTime >= 0.0) {
-		float stopSimTime = rainStopTime * animationSpeed;
+		bool shouldFade = false;
 
-		// Calculate the rain cycle for this column (same logic as getRainBrightness)
-		float columnTimeOffset = randomFloat(vec2(glyphPos.x, 0.)) * 1000.;
-		float columnSpeedOffset = randomFloat(vec2(glyphPos.x + 0.1, 0.)) * 0.5 + 0.5;
-		if (loops) {
-			columnSpeedOffset = 0.5;
+		if (rainStopEffect == 1) {
+			// Effect 1: Uniform cutoff - a line moves down the screen
+			float timeSinceStop = simTime - rainStopTime * animationSpeed;
+			float cutoffPosition = timeSinceStop * fallSpeed * 0.5;
+			float glyphYNormalized = 1.0 - (glyphPos.y / numRows);
+			shouldFade = glyphYNormalized < cutoffPosition;
+		} else {
+			// Effect 0: Per-glyph cycle - each stream completes individually
+			float stopSimTime = rainStopTime * animationSpeed;
+
+			// Calculate the rain time for this specific glyph (same logic as getRainBrightness)
+			float columnTimeOffset = randomFloat(vec2(glyphPos.x, 0.)) * 1000.;
+			float columnSpeedOffset = randomFloat(vec2(glyphPos.x + 0.1, 0.)) * 0.5 + 0.5;
+			if (loops) {
+				columnSpeedOffset = 0.5;
+			}
+
+			// Include Y position in the calculation - this is what makes streams "fall"
+			float columnTimeAtStop = columnTimeOffset + stopSimTime * fallSpeed * columnSpeedOffset;
+			float columnTimeNow = columnTimeOffset + simTime * fallSpeed * columnSpeedOffset;
+
+			// rainTime includes Y position offset - higher Y = earlier in the cycle at any given moment
+			float rainTimeAtStop = (glyphPos.y * 0.01 + columnTimeAtStop) / raindropLength;
+			float rainTimeNow = (glyphPos.y * 0.01 + columnTimeNow) / raindropLength;
+
+			float cycleAtStop = floor(rainTimeAtStop);
+			float cycleNow = floor(rainTimeNow);
+
+			shouldFade = cycleNow > cycleAtStop;
 		}
 
-		// Calculate which cycle we were in when rain stopped vs now
-		float columnTimeAtStop = columnTimeOffset + stopSimTime * fallSpeed * columnSpeedOffset;
-		float columnTimeNow = columnTimeOffset + simTime * fallSpeed * columnSpeedOffset;
-
-		float cycleAtStop = floor(columnTimeAtStop / raindropLength);
-		float cycleNow = floor(columnTimeNow / raindropLength);
-
-		// If we're in a new cycle that started after the stop, fade out
-		if (cycleNow > cycleAtStop) {
+		if (shouldFade) {
 			brightness = mix(previous.r, 0.0, brightnessDecay);
 			cursor = false;
 			activated = false;
