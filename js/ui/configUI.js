@@ -266,15 +266,14 @@ function setupEventListeners() {
 			}
 		}
 
-		// Check for panel swipe (swipe right -> close config panel)
+		// Drag panel to close (follow finger)
 		if (panelSwipeStartX !== null && e.touches.length === 1) {
 			const touch = e.touches[0];
-			const deltaX = touch.clientX - panelSwipeStartX;
+			const deltaX = Math.max(0, touch.clientX - panelSwipeStartX);
 
-			if (deltaX > SWIPE_THRESHOLD) {
-				configPanel.hide();
-				panelSwipeStartX = null;
-			}
+			// Disable transition during drag and update position
+			configPanel.element.style.transition = "none";
+			configPanel.element.style.transform = `translateX(${deltaX}px)`;
 		}
 
 		// Check for corner swipe (bottom left -> toggle controls)
@@ -304,6 +303,23 @@ function setupEventListeners() {
 			e.preventDefault();
 			longPressTriggered = false;
 		}
+		// Handle panel drag release
+		if (panelSwipeStartX !== null && configPanel.isVisible()) {
+			const panelWidth = configPanel.element.offsetWidth;
+			const currentTransform = configPanel.element.style.transform;
+			const match = currentTransform.match(/translateX\((\d+)px\)/);
+			const dragDistance = match ? parseInt(match[1]) : 0;
+
+			// Re-enable transition for snap animation
+			configPanel.element.style.transition = "";
+			configPanel.element.style.transform = "";
+
+			// Close if dragged more than 30% of panel width
+			if (dragDistance > panelWidth * 0.3) {
+				configPanel.hide();
+			}
+		}
+
 		// Reset swipe tracking
 		edgeSwipeStartX = null;
 		panelSwipeStartX = null;
