@@ -48,6 +48,11 @@ export default class REGLRenderer extends Renderer {
 		});
 	}
 
+	_getCurrentRenderTime() {
+		// Use REGL's internal time to match what shaders receive via ctx.time
+		return this.#regl ? this.#regl.now() : super._getCurrentRenderTime();
+	}
+
 	async configure(config) {
 		await super.configure(config);
 
@@ -71,6 +76,7 @@ export default class REGLRenderer extends Renderer {
 		const isRainStopped = () => this.rainStopped;
 		const getRainStopTime = () => this.rainStopTime;
 		const getRainStopEffect = () => this.rainStopEffect;
+		const getFramesSinceRainReset = () => this.framesSinceRainReset;
 		const fullScreenQuad = makeFullScreenQuad(regl, {}, {}, getRainTime);
 		const effectName = config.effect in effects ? config.effect : "palette";
 		const context = {
@@ -85,6 +91,7 @@ export default class REGLRenderer extends Renderer {
 			isRainStopped,
 			getRainStopTime,
 			getRainStopEffect,
+			getFramesSinceRainReset,
 		};
 		const pipeline = makePipeline(context, [makeRain, makeBloomPass, effects[effectName]]);
 		this.#pipeline = pipeline;
@@ -141,6 +148,8 @@ export default class REGLRenderer extends Renderer {
 				}
 				drawToScreen();
 			});
+			// Increment frame counter after rendering
+			this.incrementFramesSinceRainReset();
 		};
 
 		const frame = this.#regl.frame((o) => {

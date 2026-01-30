@@ -38,6 +38,7 @@ export default ({
 	isRainStopped,
 	getRainStopTime,
 	getRainStopEffect,
+	getFramesSinceRainReset,
 }) => {
 	const { mat4, vec3 } = glMatrix;
 	// The volumetric mode multiplies the number of columns
@@ -82,6 +83,7 @@ export default ({
 		uniforms: {
 			...introUniforms,
 			previousIntroState: introDoubleBuffer.back,
+			framesSinceRainReset: () => (getFramesSinceRainReset ? getFramesSinceRainReset() : 1000),
 		},
 
 		framebuffer: introDoubleBuffer.front,
@@ -109,6 +111,7 @@ export default ({
 			rainStopped: () => (isRainStopped ? isRainStopped() : false),
 			rainStopTime: () => (getRainStopTime ? getRainStopTime() : -1.0),
 			rainStopEffect: () => (getRainStopEffect ? getRainStopEffect() : 0),
+			framesSinceRainReset: () => (getFramesSinceRainReset ? getFramesSinceRainReset() : 1000),
 		},
 
 		framebuffer: raindropDoubleBuffer.front,
@@ -127,6 +130,7 @@ export default ({
 			...symbolUniforms,
 			raindropState: raindropDoubleBuffer.front,
 			previousSymbolState: symbolDoubleBuffer.back,
+			framesSinceRainReset: () => (getFramesSinceRainReset ? getFramesSinceRainReset() : 1000),
 		},
 
 		framebuffer: symbolDoubleBuffer.front,
@@ -152,6 +156,7 @@ export default ({
 			...effectUniforms,
 			raindropState: raindropDoubleBuffer.front,
 			previousEffectState: effectDoubleBuffer.back,
+			framesSinceRainReset: () => (getFramesSinceRainReset ? getFramesSinceRainReset() : 1000),
 		},
 
 		framebuffer: effectDoubleBuffer.front,

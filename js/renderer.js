@@ -17,6 +17,7 @@ export default class Renderer {
 	#rainStopped = false;
 	#rainStopTime = -1;
 	#rainStopEffect = 0; // 0 = per-glyph cycle, 1 = uniform cutoff
+	#framesSinceRainReset = 0;
 
 	constructor(type, ready) {
 		this.#type = type;
@@ -53,6 +54,24 @@ export default class Renderer {
 		this.#rainStopEffect = value;
 	}
 
+	get framesSinceRainReset() {
+		return this.#framesSinceRainReset;
+	}
+
+	incrementFramesSinceRainReset() {
+		this.#framesSinceRainReset++;
+	}
+
+	/**
+	 * Get the current render time in seconds.
+	 * Subclasses should override this to return their internal time (e.g., regl.now()).
+	 * This ensures timing calculations are consistent with what shaders receive.
+	 * @returns {number} Current time in seconds
+	 */
+	_getCurrentRenderTime() {
+		return performance.now() / 1000;
+	}
+
 	/**
 	 * Get the effective time offset for rain animation.
 	 * This accounts for rain-specific resets.
@@ -71,7 +90,7 @@ export default class Renderer {
 		if (!this.#rainStopped) {
 			this.#rainStopped = true;
 			// Record the time when rain was stopped (in rain time units)
-			const currentTime = performance.now() / 1000 - this.#pausedTime;
+			const currentTime = this._getCurrentRenderTime() - this.#pausedTime;
 			this.#rainStopTime = currentTime - this.#rainTimeOffset;
 		}
 	}
@@ -83,8 +102,10 @@ export default class Renderer {
 	startRain(reset = false) {
 		if (reset) {
 			// Reset rain time to 0 by setting offset to current time
-			const currentTime = performance.now() / 1000 - this.#pausedTime;
+			const currentTime = this._getCurrentRenderTime() - this.#pausedTime;
 			this.#rainTimeOffset = currentTime;
+			// Reset frame counter so shader knows to skip blending
+			this.#framesSinceRainReset = 0;
 			// Subclasses should override to also clear buffers
 			this._resetRainBuffers();
 		}

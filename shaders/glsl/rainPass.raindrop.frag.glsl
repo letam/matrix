@@ -20,6 +20,7 @@ uniform sampler2D previousRaindropState, introState;
 uniform float numColumns, numRows;
 uniform float time, tick;
 uniform float animationSpeed, fallSpeed;
+uniform float framesSinceRainReset;
 
 uniform bool loops, skipIntro, rainStopped;
 uniform float brightnessDecay;
@@ -145,7 +146,9 @@ vec4 computeResult(float simTime, bool isFirstFrame, vec2 glyphPos, vec4 previou
 
 void main()	{
 	float simTime = time * animationSpeed;
-	bool isFirstFrame = tick <= 1.;
+	// Use framesSinceRainReset to detect first frame after rain reset (buffers cleared)
+	// This ensures we don't blend with cleared (zero) buffer values
+	bool isFirstFrame = tick <= 1. || framesSinceRainReset <= 1.;
 	vec2 glyphPos = gl_FragCoord.xy;
 	vec2 screenPos = glyphPos / vec2(numColumns, numRows);
 	vec4 previous = texture2D( previousRaindropState, screenPos );
