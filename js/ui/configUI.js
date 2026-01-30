@@ -198,6 +198,50 @@ function setupEventListeners() {
 		}
 	});
 
+	// Long press handler for mobile
+	let longPressTimer = null;
+	let longPressTriggered = false;
+	const LONG_PRESS_DURATION = 500; // ms
+
+	document.addEventListener("touchstart", (e) => {
+		if (e.touches.length !== 1) return;
+
+		const touch = e.touches[0];
+		const x = touch.clientX;
+		const y = touch.clientY;
+		const width = window.innerWidth;
+		const height = window.innerHeight;
+
+		// Only start timer if touch is in a corner
+		if (isInCorner(x, y, width, height)) {
+			longPressTriggered = false;
+			longPressTimer = setTimeout(() => {
+				longPressTriggered = true;
+				contextMenu.show(x, y);
+			}, LONG_PRESS_DURATION);
+		}
+	});
+
+	document.addEventListener("touchmove", () => {
+		// Cancel long press if finger moves
+		if (longPressTimer) {
+			clearTimeout(longPressTimer);
+			longPressTimer = null;
+		}
+	});
+
+	document.addEventListener("touchend", (e) => {
+		if (longPressTimer) {
+			clearTimeout(longPressTimer);
+			longPressTimer = null;
+		}
+		// Prevent click event if long press was triggered
+		if (longPressTriggered) {
+			e.preventDefault();
+			longPressTriggered = false;
+		}
+	});
+
 	// Click outside to close context menu
 	document.addEventListener("click", (e) => {
 		if (contextMenu && contextMenu.isVisible()) {
