@@ -189,6 +189,17 @@ const colorSchemes = {
 		cursorColor: hsl(0.03, 1, 0.7),
 		backgroundColor: hsl(0, 0.2, 0.01),
 		bloomStrength: 0.9,
+	},
+	monochrome: {
+		palette: [
+			{ color: hsl(0, 0, 0), at: 0.0 },
+			{ color: hsl(0, 0, 0.25), at: 0.3 },
+			{ color: hsl(0, 0, 0.5), at: 0.6 },
+			{ color: hsl(0, 0, 0.8), at: 0.85 },
+			{ color: hsl(0, 0, 1), at: 1.0 },
+		],
+		cursorColor: hsl(0, 0, 1),
+		backgroundColor: hsl(0, 0, 0),
 		highPassThreshold: 0.0,
 	},
 };
