@@ -166,6 +166,26 @@ const colorSchemes = {
 		cursorColor: hsl(0.95, 1, 0.95),
 		backgroundColor: hsl(0.92, 0.2, 0.03),
 	},
+	emerald: {
+		palette: [
+			{ color: hsl(0.43, 0.9, 0.05), at: 0.0 },
+			{ color: hsl(0.43, 0.85, 0.25), at: 0.3 },
+			{ color: hsl(0.42, 0.9, 0.45), at: 0.6 },
+			{ color: hsl(0.4, 1, 0.65), at: 1.0 },
+		],
+		cursorColor: hsl(0.38, 1, 0.75),
+		backgroundColor: hsl(0.43, 0.3, 0.02),
+	},
+	royalBlue: {
+		palette: [
+			{ color: hsl(0.65, 0.9, 0.05), at: 0.0 },
+			{ color: hsl(0.65, 0.85, 0.2), at: 0.3 },
+			{ color: hsl(0.64, 0.9, 0.4), at: 0.6 },
+			{ color: hsl(0.62, 1, 0.6), at: 1.0 },
+		],
+		cursorColor: hsl(0.6, 1, 0.75),
+		backgroundColor: hsl(0.65, 0.3, 0.02),
+	},
 	heaven: {
 		palette: [
 			{ color: hsl(0.55, 0.3, 0.1), at: 0.0 },
