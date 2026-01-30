@@ -135,11 +135,13 @@
 				transform: translateX(100%);
 				transition: transform 0.3s ease;
 				overflow: hidden;
-				box-shadow: -4px 0 20px rgba(0, 255, 0, 0.2);
+				visibility: hidden;
 			}
 
 			.matrix-config-panel.open {
 				transform: translateX(0);
+				visibility: visible;
+				box-shadow: -4px 0 20px rgba(0, 255, 0, 0.2);
 			}
 
 			.panel-header {
