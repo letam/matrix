@@ -203,6 +203,11 @@ function setupEventListeners() {
 	let longPressTriggered = false;
 	const LONG_PRESS_DURATION = 500; // ms
 
+	// Edge swipe handler for mobile
+	let edgeSwipeStartX = null;
+	const EDGE_THRESHOLD = 20; // px from right edge to start swipe
+	const SWIPE_THRESHOLD = 50; // px to swipe left to trigger
+
 	document.addEventListener("touchstart", (e) => {
 		if (e.touches.length !== 1) return;
 
@@ -211,6 +216,11 @@ function setupEventListeners() {
 		const y = touch.clientY;
 		const width = window.innerWidth;
 		const height = window.innerHeight;
+
+		// Check for edge swipe from right edge
+		if (x > width - EDGE_THRESHOLD && !configPanel.isVisible()) {
+			edgeSwipeStartX = x;
+		}
 
 		// Only start timer if touch is in a corner
 		if (isInCorner(x, y, width, height)) {
@@ -222,11 +232,22 @@ function setupEventListeners() {
 		}
 	});
 
-	document.addEventListener("touchmove", () => {
+	document.addEventListener("touchmove", (e) => {
 		// Cancel long press if finger moves
 		if (longPressTimer) {
 			clearTimeout(longPressTimer);
 			longPressTimer = null;
+		}
+
+		// Check for edge swipe
+		if (edgeSwipeStartX !== null && e.touches.length === 1) {
+			const touch = e.touches[0];
+			const deltaX = edgeSwipeStartX - touch.clientX;
+
+			if (deltaX > SWIPE_THRESHOLD) {
+				configPanel.show();
+				edgeSwipeStartX = null;
+			}
 		}
 	});
 
@@ -240,6 +261,8 @@ function setupEventListeners() {
 			e.preventDefault();
 			longPressTriggered = false;
 		}
+		// Reset edge swipe tracking
+		edgeSwipeStartX = null;
 	});
 
 	// Click outside to close context menu
