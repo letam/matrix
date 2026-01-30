@@ -261,6 +261,7 @@ const defaults = {
 	useHalfFloat: false,
 	renderer: "regl", // The preferred web graphics API
 	suppressWarnings: false, // Whether to show warnings to visitors on load
+	controls: false, // Whether to show UI controls (context menu, config panel, buttons)
 	isometric: false,
 	loops: false,
 	skipIntro: true,
@@ -610,6 +611,7 @@ const paramMapping = {
 	skipIntro: { key: "skipIntro", parser: isTrue },
 	renderer: { key: "renderer", parser: (s) => s },
 	suppressWarnings: { key: "suppressWarnings", parser: isTrue },
+	controls: { key: "controls", parser: isTrue },
 	once: { key: "once", parser: isTrue },
 	isometric: { key: "isometric", parser: isTrue },
 	rainStopEffect: { key: "rainStopEffect", parser: (s) => nullNaN(parseInt(s)) },

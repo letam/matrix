@@ -18,12 +18,16 @@ let isInitialized = false;
  * Initialize the configuration UI system
  * @param {Object} config - Current configuration object
  * @param {Object} rendererInstance - The renderer instance to control
+ * @param {Object} options - Options for UI initialization
+ * @param {boolean} options.showButtons - Whether to show pause/rain buttons (default: true)
  */
-export function initConfigUI(config, rendererInstance) {
+export function initConfigUI(config, rendererInstance, options = {}) {
 	if (isInitialized) {
 		console.warn("Config UI already initialized");
 		return;
 	}
+
+	const { showButtons = true } = options;
 
 	renderer = rendererInstance;
 
@@ -37,13 +41,16 @@ export function initConfigUI(config, rendererInstance) {
 	const panelEl = configPanel.create();
 	document.body.appendChild(panelEl);
 
-	// Create pause button
-	pauseButton = createPauseButton();
-	document.body.appendChild(pauseButton);
+	// Create buttons only if showButtons is true
+	if (showButtons) {
+		// Create pause button
+		pauseButton = createPauseButton();
+		document.body.appendChild(pauseButton);
 
-	// Create rain control button
-	rainButton = createRainButton();
-	document.body.appendChild(rainButton);
+		// Create rain control button
+		rainButton = createRainButton();
+		document.body.appendChild(rainButton);
+	}
 
 	// Wire up context menu to open panel
 	contextMenu.onOpenSettings = () => {

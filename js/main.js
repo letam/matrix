@@ -47,10 +47,8 @@ document.body.onload = async () => {
 		// Expose renderer globally for console access
 		window.renderer = renderer;
 
-		// Initialize configuration UI
-		if (!config.suppressWarnings) {
-			initConfigUI(config, renderer);
-		}
+		// Initialize configuration UI (context menu + panel always available, buttons only with ?controls=true)
+		initConfigUI(config, renderer, { showButtons: config.controls });
 	};
 
 	if (isRunningSwiftShader() && !config.suppressWarnings) {
