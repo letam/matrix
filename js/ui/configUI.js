@@ -13,6 +13,7 @@ let pauseButton = null;
 let rainButton = null;
 let renderer = null;
 let isInitialized = false;
+let buttonsVisible = false;
 
 /**
  * Initialize the configuration UI system
@@ -43,13 +44,7 @@ export function initConfigUI(config, rendererInstance, options = {}) {
 
 	// Create buttons only if showButtons is true
 	if (showButtons) {
-		// Create pause button
-		pauseButton = createPauseButton();
-		document.body.appendChild(pauseButton);
-
-		// Create rain control button
-		rainButton = createRainButton();
-		document.body.appendChild(rainButton);
+		showControlButtons();
 	}
 
 	// Wire up context menu to open panel
@@ -57,10 +52,59 @@ export function initConfigUI(config, rendererInstance, options = {}) {
 		configPanel.show();
 	};
 
+	// Wire up context menu to toggle controls
+	contextMenu.onToggleControls = () => {
+		if (buttonsVisible) {
+			hideControlButtons();
+		} else {
+			showControlButtons();
+		}
+		contextMenu.updateControlsLabel(buttonsVisible);
+	};
+
+	// Set initial label
+	contextMenu.updateControlsLabel(buttonsVisible);
+
 	// Set up event listeners
 	setupEventListeners();
 
 	isInitialized = true;
+}
+
+/**
+ * Show the control buttons (pause and rain)
+ */
+function showControlButtons() {
+	if (buttonsVisible) return;
+
+	// Create pause button
+	pauseButton = createPauseButton();
+	document.body.appendChild(pauseButton);
+
+	// Create rain control button
+	rainButton = createRainButton();
+	document.body.appendChild(rainButton);
+
+	buttonsVisible = true;
+}
+
+/**
+ * Hide the control buttons (pause and rain)
+ */
+function hideControlButtons() {
+	if (!buttonsVisible) return;
+
+	if (pauseButton && pauseButton.parentNode) {
+		pauseButton.parentNode.removeChild(pauseButton);
+		pauseButton = null;
+	}
+
+	if (rainButton && rainButton.parentNode) {
+		rainButton.parentNode.removeChild(rainButton);
+		rainButton = null;
+	}
+
+	buttonsVisible = false;
 }
 
 /**

@@ -7,6 +7,8 @@ export class ContextMenu {
 	constructor() {
 		this.element = null;
 		this.onOpenSettings = null;
+		this.onToggleControls = null;
+		this.controlsItem = null;
 	}
 
 	/**
@@ -28,8 +30,20 @@ export class ContextMenu {
 			this.hide();
 		});
 
+		const controlsItem = document.createElement("div");
+		controlsItem.className = "menu-item";
+		controlsItem.textContent = "🎛️ Show Controls";
+		controlsItem.addEventListener("click", () => {
+			if (this.onToggleControls) {
+				this.onToggleControls();
+			}
+			this.hide();
+		});
+
 		menu.appendChild(settingsItem);
+		menu.appendChild(controlsItem);
 		this.element = menu;
+		this.controlsItem = controlsItem;
 
 		return menu;
 	}
@@ -44,7 +58,7 @@ export class ContextMenu {
 
 		// Adjust position to keep menu within viewport
 		const menuWidth = 180;
-		const menuHeight = 50;
+		const menuHeight = 80;
 		const viewportWidth = window.innerWidth;
 		const viewportHeight = window.innerHeight;
 
@@ -82,6 +96,16 @@ export class ContextMenu {
 	}
 
 	/**
+	 * Update the controls toggle label
+	 * @param {boolean} controlsVisible - Whether controls are currently visible
+	 */
+	updateControlsLabel(controlsVisible) {
+		if (this.controlsItem) {
+			this.controlsItem.textContent = controlsVisible ? "🎛️ Hide Controls" : "🎛️ Show Controls";
+		}
+	}
+
+	/**
 	 * Destroy the context menu
 	 */
 	destroy() {
@@ -90,5 +114,7 @@ export class ContextMenu {
 		}
 		this.element = null;
 		this.onOpenSettings = null;
+		this.onToggleControls = null;
+		this.controlsItem = null;
 	}
 }
