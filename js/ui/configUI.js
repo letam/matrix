@@ -203,10 +203,14 @@ function setupEventListeners() {
 	let longPressTriggered = false;
 	const LONG_PRESS_DURATION = 500; // ms
 
-	// Edge swipe handler for mobile
+	// Swipe gestures for mobile:
+	// - Right edge swipe left: open config panel
+	// - Bottom left corner swipe right: toggle controls
 	let edgeSwipeStartX = null;
+	let cornerSwipeStart = null;
 	const EDGE_THRESHOLD = 20; // px from right edge to start swipe
-	const SWIPE_THRESHOLD = 50; // px to swipe left to trigger
+	const CORNER_SIZE = 60; // px from bottom-left corner to start swipe
+	const SWIPE_THRESHOLD = 50; // px distance to trigger action
 
 	document.addEventListener("touchstart", (e) => {
 		if (e.touches.length !== 1) return;
@@ -220,6 +224,11 @@ function setupEventListeners() {
 		// Check for edge swipe from right edge
 		if (x > width - EDGE_THRESHOLD && !configPanel.isVisible()) {
 			edgeSwipeStartX = x;
+		}
+
+		// Check for corner swipe from bottom left
+		if (x < CORNER_SIZE && y > height - CORNER_SIZE) {
+			cornerSwipeStart = { x, y };
 		}
 
 		// Only start timer if touch is in a corner
@@ -239,7 +248,7 @@ function setupEventListeners() {
 			longPressTimer = null;
 		}
 
-		// Check for edge swipe
+		// Check for edge swipe (right edge -> open config panel)
 		if (edgeSwipeStartX !== null && e.touches.length === 1) {
 			const touch = e.touches[0];
 			const deltaX = edgeSwipeStartX - touch.clientX;
@@ -247,6 +256,22 @@ function setupEventListeners() {
 			if (deltaX > SWIPE_THRESHOLD) {
 				configPanel.show();
 				edgeSwipeStartX = null;
+			}
+		}
+
+		// Check for corner swipe (bottom left -> toggle controls)
+		if (cornerSwipeStart !== null && e.touches.length === 1) {
+			const touch = e.touches[0];
+			const deltaX = touch.clientX - cornerSwipeStart.x;
+
+			if (deltaX > SWIPE_THRESHOLD) {
+				if (buttonsVisible) {
+					hideControlButtons();
+				} else {
+					showControlButtons();
+				}
+				contextMenu.updateControlsLabel(buttonsVisible);
+				cornerSwipeStart = null;
 			}
 		}
 	});
@@ -261,8 +286,9 @@ function setupEventListeners() {
 			e.preventDefault();
 			longPressTriggered = false;
 		}
-		// Reset edge swipe tracking
+		// Reset swipe tracking
 		edgeSwipeStartX = null;
+		cornerSwipeStart = null;
 	});
 
 	// Click outside to close context menu
