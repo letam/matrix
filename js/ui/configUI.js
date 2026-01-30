@@ -307,16 +307,26 @@ function setupEventListeners() {
 		if (panelSwipeStartX !== null && configPanel.isVisible()) {
 			const panelWidth = configPanel.element.offsetWidth;
 			const currentTransform = configPanel.element.style.transform;
-			const match = currentTransform.match(/translateX\((\d+)px\)/);
-			const dragDistance = match ? parseInt(match[1]) : 0;
+			const match = currentTransform.match(/translateX\((\d+(?:\.\d+)?)px\)/);
+			const dragDistance = match ? parseFloat(match[1]) : 0;
 
 			// Re-enable transition for snap animation
 			configPanel.element.style.transition = "";
-			configPanel.element.style.transform = "";
 
 			// Close if dragged more than 30% of panel width
 			if (dragDistance > panelWidth * 0.3) {
-				configPanel.hide();
+				// Animate from current position to fully closed (100%)
+				configPanel.element.style.transform = "translateX(100%)";
+				// After animation completes, clean up properly
+				const cleanup = () => {
+					configPanel.element.style.transform = "";
+					configPanel.hide();
+					configPanel.element.removeEventListener("transitionend", cleanup);
+				};
+				configPanel.element.addEventListener("transitionend", cleanup, { once: true });
+			} else {
+				// Snap back to open position
+				configPanel.element.style.transform = "";
 			}
 		}
 
