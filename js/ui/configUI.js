@@ -205,8 +205,10 @@ function setupEventListeners() {
 
 	// Swipe gestures for mobile:
 	// - Right edge swipe left: open config panel
+	// - Swipe right on panel: close config panel
 	// - Bottom left corner swipe right: toggle controls
 	let edgeSwipeStartX = null;
+	let panelSwipeStartX = null;
 	let cornerSwipeStart = null;
 	const EDGE_THRESHOLD = 20; // px from right edge to start swipe
 	const CORNER_SIZE = 60; // px from bottom-left corner to start swipe
@@ -224,6 +226,11 @@ function setupEventListeners() {
 		// Check for edge swipe from right edge
 		if (x > width - EDGE_THRESHOLD && !configPanel.isVisible()) {
 			edgeSwipeStartX = x;
+		}
+
+		// Check for swipe on config panel to close
+		if (configPanel.isVisible() && configPanel.element.contains(e.target)) {
+			panelSwipeStartX = x;
 		}
 
 		// Check for corner swipe from bottom left
@@ -259,6 +266,17 @@ function setupEventListeners() {
 			}
 		}
 
+		// Check for panel swipe (swipe right -> close config panel)
+		if (panelSwipeStartX !== null && e.touches.length === 1) {
+			const touch = e.touches[0];
+			const deltaX = touch.clientX - panelSwipeStartX;
+
+			if (deltaX > SWIPE_THRESHOLD) {
+				configPanel.hide();
+				panelSwipeStartX = null;
+			}
+		}
+
 		// Check for corner swipe (bottom left -> toggle controls)
 		if (cornerSwipeStart !== null && e.touches.length === 1) {
 			const touch = e.touches[0];
@@ -288,6 +306,7 @@ function setupEventListeners() {
 		}
 		// Reset swipe tracking
 		edgeSwipeStartX = null;
+		panelSwipeStartX = null;
 		cornerSwipeStart = null;
 	});
 
