@@ -1,9 +1,16 @@
 import makeConfig from "./utils/config.js";
 import { initConfigUI } from "./ui/configUI.js";
 
-document.addEventListener("touchmove", (e) => e.preventDefault(), {
-	passive: false,
-});
+document.addEventListener(
+	"touchmove",
+	(e) => {
+		// Allow scrolling inside config panel
+		if (e.target.closest(".matrix-config-panel")) return;
+		// Prevent page bounce elsewhere
+		e.preventDefault();
+	},
+	{ passive: false },
+);
 
 const supportsWebGPU = async () => {
 	return (
