@@ -4,6 +4,7 @@
  */
 
 import { ConfigState } from "./configState.js";
+import { colorSchemes } from "../utils/config.js";
 
 // Parameter definitions organized by category
 export const CATEGORIES = {
@@ -37,20 +38,7 @@ export const CATEGORIES = {
 			colorScheme: {
 				type: "select",
 				label: "Color Scheme",
-				options: [
-					"classic",
-					"blue",
-					"cyan",
-					"electricBlue",
-					"fire",
-					"lava",
-					"sunset",
-					"purple",
-					"magenta",
-					"pink",
-					"heaven",
-					"hell",
-				],
+				options: Object.keys(colorSchemes),
 			},
 			colorMap: {
 				type: "select",
