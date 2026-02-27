@@ -29,7 +29,12 @@ const isRunningSwiftShader = () => {
 
 document.body.onload = async () => {
 	const urlParams = new URLSearchParams(window.location.search);
-	const config = makeConfig(Object.fromEntries(urlParams.entries()));
+	const params = {
+		skipIntro: "false",
+		colorScheme: "fire",
+		...Object.fromEntries(urlParams.entries()),
+	};
+	const config = makeConfig(params);
 	const useWebGPU = (await supportsWebGPU()) && ["webgpu"].includes(config.renderer?.toLowerCase());
 	const rendererModule = import(`./${useWebGPU ? "webgpu" : "regl"}/renderer.js`);
 
